@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 InternTrack
+# InternTrack
 
 ### Smart Internship Application Tracking Platform
 
@@ -14,60 +14,57 @@ Manage applications, interviews, deadlines, and career progress — all in one p
 
 ---
 
-## 📌 Overview
+## Overview
 
 InternTrack helps students and job seekers stay organized during internship and placement season by tracking every application stage in a clean dashboard.
 
 ---
 
-## ✨ Features
+## Features
 
-* 🔐 Secure Authentication (Login / Signup)
-* 📄 Add & Manage Applications
-* 📊 Dashboard Analytics
-* 📌 Status Tracking (Applied, Interview, Offer, Rejected)
-* 🔍 Search & Filter Applications
-* 📝 Notes & Follow-up Tracking
-* ⏰ Interview & Deadline Reminders
-* 💡 Smart Resume Insights *(Planned)*
-* 🤖 Job Description Analysis *(Planned)*
-* 🚀 Intelligent Suggestions *(Planned)*
+- Secure Authentication (Login / Signup)
+- Add & Manage Applications
+- Dashboard Analytics
+- Status Tracking (Applied, Interview, Offer, Rejected)
+- Search & Filter Applications
+- Notes & Follow-up Tracking
+- Interview & Deadline Reminders
+- Smart Resume Insights (Planned)
+- Job Description Analysis (Planned)
+- Intelligent Suggestions (Planned)
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 
-* React.js
-* Tailwind CSS
+- React.js
+- Tailwind CSS
 
 ### Backend
 
-* Node.js
-* Express.js
+- Node.js
+- Express.js
 
 ### Database
 
-* MongoDB
+- MongoDB
 
 ---
 
-## 📷 UI Preview
+## UI Preview
 
 Modern dashboard interface with sidebar navigation, analytics cards, application tables, charts, and reminders.
 
 ---
 
-## 🚧 Project Status
+## Project Status
 
 Currently under development.
 
 ---
 
-## 🎯 Vision
+## Vision
 
 To simplify internship tracking and help students focus on opportunities instead of spreadsheets.
-
----
-
