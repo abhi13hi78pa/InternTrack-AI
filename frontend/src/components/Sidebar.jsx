@@ -1,4 +1,5 @@
-import { LayoutDashboard, FileText, PlusCircle, Calendar, BarChart3, X } from 'lucide-react'
+import { LayoutDashboard, FileText, PlusCircle, Calendar, BarChart3, X, LogOut, BrainCircuit } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard' },
@@ -6,9 +7,11 @@ const menuItems = [
   { icon: PlusCircle, label: 'Add Application' },
   { icon: Calendar, label: 'Calendar' },
   { icon: BarChart3, label: 'Analytics' },
+  { icon: BrainCircuit, label: 'AI Prep Hub' },
 ]
 
 function Sidebar({ sidebarOpen, setSidebarOpen, activePage, onMenuSelect }) {
+  const { logout } = useAuth()
   return (
     <>
       {/* Mobile overlay */}
@@ -21,16 +24,16 @@ function Sidebar({ sidebarOpen, setSidebarOpen, activePage, onMenuSelect }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800
         transform transition-transform duration-200 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-slate-800 transition-colors">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">IT</span>
             </div>
-            <span className="text-lg font-semibold text-gray-900">InternTrack</span>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white transition-colors">InternTrack</span>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-gray-500">
             <X size={20} />
@@ -48,8 +51,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen, activePage, onMenuSelect }) {
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
                 ${activePage === item.label
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                 }
               `}
             >
@@ -58,6 +61,16 @@ function Sidebar({ sidebarOpen, setSidebarOpen, activePage, onMenuSelect }) {
             </button>
           ))}
         </nav>
+        
+        <div className="absolute bottom-0 w-full p-4 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
       </aside>
     </>
   )

@@ -9,12 +9,15 @@ import RecentApplications from '../components/RecentApplications'
 import StatusChart from '../components/StatusChart'
 import UpcomingReminders from '../components/UpcomingReminders'
 import Calendar from '../components/Calendar'
+import PrepHub from './PrepHub'
 import { useTheme } from '../contexts/ThemeContext'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { useAuth } from '../contexts/AuthContext'
 
 function Dashboard() {
   const { darkMode } = useTheme()
+  const { token, logout, user } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
@@ -23,6 +26,7 @@ function Dashboard() {
   const [isMobile, setIsMobile] = useState(false)
   const [page, setPage] = useState('Dashboard')
   const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('Total')
   const [formData, setFormData] = useState({
     company: '',
     role: '',
@@ -44,9 +48,17 @@ function Dashboard() {
     try {
       const response = await fetch('/api/applications', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(formData)
       })
+
+      if (response.status === 401) {
+        logout()
+        return
+      }
 
       if (!response.ok) {
         const text = await response.text()
@@ -86,7 +98,15 @@ function Dashboard() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('/api/applications')
+        const response = await fetch('/api/applications', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        if (response.status === 401) {
+          logout()
+          return
+        }
         if (!response.ok) {
           throw new Error(`Unable to load applications (${response.status})`)
         }
@@ -103,19 +123,23 @@ function Dashboard() {
   }, [])
 
   const filteredApplications = applications.filter((app) => {
+    // Filter by search term
     const query = searchTerm.trim().toLowerCase()
-    if (!query) return true
-
-    return [app.company, app.role, app.status, app.notes]
+    const matchesSearch = query === '' || [app.company, app.role, app.status, app.notes]
       .some((field) => String(field || '').toLowerCase().includes(query))
+      
+    // Filter by status (unless 'Total' is selected)
+    const matchesStatus = statusFilter === 'Total' || app.status === statusFilter
+
+    return matchesSearch && matchesStatus
   })
 
   const statsData = [
-    { label: 'Total', value: applications.length, icon: Briefcase, color: 'bg-blue-50 text-blue-600' },
-    { label: 'Applied', value: applications.filter((app) => app.status === 'Applied').length, icon: Send, color: 'bg-indigo-50 text-indigo-600' },
-    { label: 'Interview', value: applications.filter((app) => app.status === 'Interview').length, icon: MessageSquare, color: 'bg-amber-50 text-amber-600' },
-    { label: 'Offer', value: applications.filter((app) => app.status === 'Offer').length, icon: CheckCircle, color: 'bg-emerald-50 text-emerald-600' },
-    { label: 'Rejected', value: applications.filter((app) => app.status === 'Rejected').length, icon: XCircle, color: 'bg-red-50 text-red-600' }
+    { label: 'Total', value: applications.length, icon: Briefcase, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', activeBorder: 'border-b-blue-500' },
+    { label: 'Applied', value: applications.filter((app) => app.status === 'Applied').length, icon: Send, color: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400', activeBorder: 'border-b-indigo-500' },
+    { label: 'Interview', value: applications.filter((app) => app.status === 'Interview').length, icon: MessageSquare, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', activeBorder: 'border-b-amber-500' },
+    { label: 'Offer', value: applications.filter((app) => app.status === 'Offer').length, icon: CheckCircle, color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400', activeBorder: 'border-b-emerald-500' },
+    { label: 'Rejected', value: applications.filter((app) => app.status === 'Rejected').length, icon: XCircle, color: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400', activeBorder: 'border-b-red-500' }
   ]
 
 
@@ -136,6 +160,8 @@ function Dashboard() {
         return 'Calendar'
       case 'Analytics':
         return 'Analytics'
+      case 'AI Prep Hub':
+        return 'AI Prep Hub'
       default:
         return 'Dashboard'
     }
@@ -146,62 +172,62 @@ function Dashboard() {
       case 'Applications':
         return (
           <div className="space-y-6">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">All Applications</h2>
+            <div className="rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-colors">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors">All Applications</h2>
               <RecentApplications applications={filteredApplications} loading={dataLoading} />
             </div>
           </div>
         )
       case 'Add Application':
         return (
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Application</h2>
-            <p className="text-sm text-gray-600 mb-6">
+          <div className="rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-colors">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Add New Application</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 transition-colors">
               Enter a new application and save it. The data will be persisted to the backend and displayed in the application list.
             </p>
             <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Company</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Company</span>
                 <input
                   type="text"
                   name="company"
                   value={formData.company}
                   onChange={handleInputChange}
                   required
-                  className="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                   placeholder="Company name"
                 />
               </label>
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Role</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Role</span>
                 <input
                   type="text"
                   name="role"
                   value={formData.role}
                   onChange={handleInputChange}
                   required
-                  className="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                   placeholder="Role"
                 />
               </label>
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Date</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Date</span>
                 <input
                   type="date"
                   name="date"
                   value={formData.date}
                   onChange={handleInputChange}
                   required
-                  className="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                 />
               </label>
               <label className="space-y-2">
-                <span className="text-sm font-medium text-gray-700">Status</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</span>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
-                  className="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                 >
                   <option>Applied</option>
                   <option>Interview</option>
@@ -210,13 +236,13 @@ function Dashboard() {
                 </select>
               </label>
               <label className="space-y-2 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Notes</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Notes</span>
                 <textarea
                   name="notes"
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={4}
-                  className="w-full rounded-xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
                   placeholder="Add any notes or interview details"
                 />
               </label>
@@ -240,25 +266,80 @@ function Dashboard() {
         )
       case 'Analytics':
         return (
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Analytics</h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Explore your application trends and status breakdown here.
-              </p>
-              <StatusChart segments={chartSegments} />
-            </div>
-            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Key metrics</h2>
+          <div className="space-y-6">
+            {/* Top row: Metrics */}
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Performance Overview</h2>
               <StatsCards stats={statsData} />
             </div>
+
+            {/* Bottom row: Charts & Insights */}
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Status Breakdown */}
+              <div className="rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-colors flex flex-col">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Status Breakdown</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Distribution of your applications across stages.</p>
+                <div className="flex-1 flex items-center justify-center">
+                  <StatusChart segments={chartSegments} />
+                </div>
+              </div>
+
+              {/* Conversion Funnel */}
+              <div className="rounded-3xl border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm transition-colors flex flex-col">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Conversion Funnel</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">How effectively you're moving through the pipeline.</p>
+                
+                <div className="flex-1 space-y-6">
+                  {[
+                    { label: 'Total Applications', value: statsData[0].value, color: 'bg-blue-500' },
+                    { label: 'Interviews Secured', value: statsData[2].value, color: 'bg-amber-500' },
+                    { label: 'Offers Received', value: statsData[3].value, color: 'bg-emerald-500' }
+                  ].map((stage, i, arr) => {
+                    const percentage = arr[0].value === 0 ? 0 : Math.round((stage.value / arr[0].value) * 100);
+                    return (
+                      <div key={stage.label} className="relative">
+                        <div className="flex justify-between text-sm font-medium mb-2">
+                          <span className="text-gray-700 dark:text-gray-300">{stage.label}</span>
+                          <span className="text-gray-900 dark:text-white font-bold">{stage.value} <span className="text-gray-400 dark:text-gray-500 text-xs font-normal ml-1">({percentage}%)</span></span>
+                        </div>
+                        <div className="w-full bg-gray-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${percentage}%` }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                            className={`h-full rounded-full ${stage.color}`}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  <div className="mt-8 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-800/30">
+                    <h4 className="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
+                      <span className="text-lg">💡</span> Pro Tip
+                    </h4>
+                    <p className="text-xs text-indigo-700 dark:text-indigo-400 leading-relaxed">
+                      If your Interview-to-Offer rate is low, try generating a new preparation plan in the AI Prep Hub focusing on Mock Interviews.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        )
+      case 'AI Prep Hub':
+        return (
+          <PrepHub />
         )
       default:
         return (
           <>
             <motion.div variants={itemVariants}>
-              <StatsCards stats={statsData} />
+              <StatsCards 
+                stats={statsData} 
+                onCardClick={setStatusFilter} 
+                activeStatus={statusFilter} 
+              />
             </motion.div>
 
             <motion.div
@@ -412,6 +493,7 @@ function Dashboard() {
                   { icon: '➕', label: 'Add Application' },
                   { icon: '📅', label: 'Calendar' },
                   { icon: '📈', label: 'Analytics' },
+                  { icon: '✨', label: 'AI Prep Hub' },
                 ].map((item) => {
                   const isActive = page === item.label
                   return (

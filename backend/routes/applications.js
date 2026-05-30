@@ -10,8 +10,8 @@ const {
 } = require('../controllers/applicationController');
 
 router.route('/')
-  .get(getApplicationsPublic)
-  .post(createApplication);
+  .get(protect, getApplications)
+  .post(protect, createApplication);
 
 router.route('/:id')
   .put(protect, updateApplication)

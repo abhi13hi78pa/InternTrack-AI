@@ -19,6 +19,7 @@ const startServer = async () => {
   // API routes
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/applications', require('./routes/applications'));
+  app.use('/api/ai', require('./routes/ai'));
 
   // Serve frontend build in production from the same port
   if (process.env.NODE_ENV === 'production') {

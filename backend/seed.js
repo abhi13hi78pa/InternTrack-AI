@@ -9,12 +9,12 @@ const seedApplications = async () => {
     console.log('MongoDB Connected');
 
     // Create a demo user if not exists
-    let user = await User.findOne({ email: 'demo@interntrack.com' });
+    let user = await User.findOne({ email: 'abhishekkumarp3102@gmail.com' });
     if (!user) {
       user = await User.create({
         name: 'Demo User',
-        email: 'demo@interntrack.com',
-        password: 'demo123456'
+        email: 'abhishekkumarp3102@gmail.com',
+        password: 'Abhi@123'
       });
       console.log('Created demo user');
     }

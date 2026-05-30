@@ -20,8 +20,8 @@ function StatusChart({ segments = [] }) {
   })
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-base font-semibold text-gray-900 mb-4">Status Breakdown</h2>
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-6 transition-colors">
+      <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-4 transition-colors">Status Breakdown</h2>
 
       <div className="flex items-center justify-center mb-6">
         <div
@@ -30,10 +30,10 @@ function StatusChart({ segments = [] }) {
             background: `conic-gradient(${gradientStops.join(', ')})`
           }}
         >
-          <div className="absolute inset-4 bg-white rounded-full flex items-center justify-center">
+          <div className="absolute inset-4 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center transition-colors">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900">{total}</p>
-              <p className="text-xs text-gray-500">Total</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">{total}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">Total</p>
             </div>
           </div>
         </div>
@@ -44,9 +44,9 @@ function StatusChart({ segments = [] }) {
           <div key={d.label} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }}></div>
-              <span className="text-sm text-gray-600">{d.label}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400 transition-colors">{d.label}</span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">{d.value}</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-white transition-colors">{d.value}</span>
           </div>
         ))}
       </div>
