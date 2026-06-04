@@ -4,9 +4,12 @@ services:
     env: node
     plan: free
     branch: main
-    root: backend
-    buildCommand: cd ../frontend && npm install && npm run build && cd ../backend && npm install
-    startCommand: npm start
+    # Use repository root so we can build frontend first, then backend
+    root: .
+    # Build frontend, then install backend deps (use npm ci in CI environments)
+    buildCommand: bash -lc "cd frontend && npm ci && npm run build && cd backend && npm ci"
+    # Start the backend service which serves the frontend build
+    startCommand: bash -lc "cd backend && npm start"
     autoDeploy: true
     envVars:
       - key: NODE_ENV
