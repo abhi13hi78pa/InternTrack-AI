@@ -1,0 +1,13 @@
+services:
+  - type: web_service
+    name: InternTrack
+    env: node
+    plan: free
+    branch: main
+    root: backend
+    buildCommand: cd ../frontend && npm install && npm run build && cd ../backend && npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
