@@ -14,6 +14,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useAuth } from '../contexts/AuthContext'
+import { parseApiResponse } from '../utils/api'
 
 function Dashboard() {
   const { darkMode } = useTheme()
@@ -60,12 +61,7 @@ function Dashboard() {
         return
       }
 
-      if (!response.ok) {
-        const text = await response.text()
-        throw new Error(text || 'Unable to save application')
-      }
-
-      const newApplication = await response.json()
+      const newApplication = await parseApiResponse(response, 'Unable to save application')
       setApplications((prev) => [newApplication, ...prev])
       setPage('Applications')
       setFormData({ company: '', role: '', date: '', status: 'Applied', notes: '' })
@@ -107,10 +103,7 @@ function Dashboard() {
           logout()
           return
         }
-        if (!response.ok) {
-          throw new Error(`Unable to load applications (${response.status})`)
-        }
-        const data = await response.json()
+        const data = await parseApiResponse(response, 'Unable to load applications')
         setApplications(data)
       } catch (err) {
         setError(err.message)

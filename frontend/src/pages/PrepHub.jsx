@@ -5,6 +5,7 @@ import { BrainCircuit, Sparkles, Target, CalendarDays, Loader2, ArrowRight, X } 
 import PrepCompanyInsights from '../components/PrepCompanyInsights';
 import PrepRoadmapTimeline from '../components/PrepRoadmapTimeline';
 import PrepStudyMaterials from '../components/PrepStudyMaterials';
+import { parseApiResponse } from '../utils/api';
 
 function PrepHub() {
   const { token } = useAuth();
@@ -31,12 +32,10 @@ function PrepHub() {
       const res = await fetch('/api/ai/roadmaps', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) {
-        const data = await res.json();
-        setRoadmaps(data);
-        if (data.length > 0 && !activeRoadmap) {
-          setActiveRoadmap(data[0]);
-        }
+      const data = await parseApiResponse(res, 'Failed to load prep roadmaps');
+      setRoadmaps(data);
+      if (data.length > 0 && !activeRoadmap) {
+        setActiveRoadmap(data[0]);
       }
     } catch (err) {
       toast.error('Failed to load prep roadmaps');
@@ -58,11 +57,7 @@ function PrepHub() {
         body: JSON.stringify(formData)
       });
 
-      if (!res.ok) {
-        throw new Error('Failed to generate roadmap');
-      }
-
-      const newRoadmap = await res.json();
+      const newRoadmap = await parseApiResponse(res, 'Failed to generate roadmap');
       setRoadmaps(prev => [newRoadmap, ...prev]);
       setActiveRoadmap(newRoadmap);
       setShowForm(false);
@@ -78,10 +73,11 @@ function PrepHub() {
   const deleteRoadmap = async (id) => {
     if (!window.confirm('Are you sure you want to delete this roadmap?')) return;
     try {
-      await fetch(`/api/ai/roadmaps/${id}`, {
+      const res = await fetch(`/api/ai/roadmaps/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      await parseApiResponse(res, 'Failed to delete roadmap');
       setRoadmaps(roadmaps.filter(r => r._id !== id));
       if (activeRoadmap?._id === id) {
         setActiveRoadmap(null);
@@ -103,11 +99,9 @@ function PrepHub() {
         body: JSON.stringify({ completed })
       });
       
-      if (res.ok) {
-        const updated = await res.json();
-        setActiveRoadmap(updated);
-        setRoadmaps(roadmaps.map(r => r._id === updated._id ? updated : r));
-      }
+      const updated = await parseApiResponse(res, 'Failed to update task');
+      setActiveRoadmap(updated);
+      setRoadmaps(roadmaps.map(r => r._id === updated._id ? updated : r));
     } catch (err) {
       toast.error('Failed to update task');
     }

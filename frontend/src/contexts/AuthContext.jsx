@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { parseApiResponse } from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -31,11 +32,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
+      const data = await parseApiResponse(res, 'Login failed');
 
       localStorage.setItem('token', data.token);
       setToken(data.token);
@@ -58,11 +55,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
+      const data = await parseApiResponse(res, 'Registration failed');
 
       localStorage.setItem('token', data.token);
       setToken(data.token);
@@ -83,8 +76,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ token: credentialToken }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Google login failed');
+      const data = await parseApiResponse(res, 'Google login failed');
 
       localStorage.setItem('token', data.token);
       setToken(data.token);
@@ -105,8 +97,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ code }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'GitHub login failed');
+      const data = await parseApiResponse(res, 'GitHub login failed');
 
       localStorage.setItem('token', data.token);
       setToken(data.token);

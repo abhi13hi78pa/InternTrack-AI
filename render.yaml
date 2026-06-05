@@ -4,10 +4,10 @@ services:
     env: node
     plan: free
     branch: main
-    # Backend API service only. Frontend is deployed separately.
+    # Full-stack service: build React, then serve it from Express with the API.
     root: .
-    buildCommand: bash -lc "cd backend && npm ci"
-    startCommand: bash -lc "cd backend && npm start"
+    buildCommand: npm run build
+    startCommand: npm start
     autoDeploy: true
     envVars:
       - key: NODE_ENV

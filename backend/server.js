@@ -1,6 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -10,6 +12,7 @@ const startServer = async () => {
   await connectDB();
 
   const app = express();
+  const frontendDist = path.join(__dirname, '..', 'frontend', 'dist');
 
   // Middleware
   app.use(cors());
@@ -21,7 +24,11 @@ const startServer = async () => {
   app.use('/api/ai', require('./routes/ai'));
 
   // API status route for the backend service root
-  app.get('/', (req, res) => {
+  app.get('/', (req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDist)) {
+      return next();
+    }
+
     res.json({ service: 'InternTrack API', status: 'ok' });
   });
 
@@ -29,6 +36,18 @@ const startServer = async () => {
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
   });
+
+  app.use('/api', (req, res) => {
+    res.status(404).json({ message: `API route not found: ${req.originalUrl}` });
+  });
+
+  if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+  }
 
   const PORT = process.env.PORT || 5000;
 
