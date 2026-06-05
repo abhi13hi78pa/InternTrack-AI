@@ -20,6 +20,11 @@ const startServer = async () => {
   app.use('/api/applications', require('./routes/applications'));
   app.use('/api/ai', require('./routes/ai'));
 
+  // API status route for the backend service root
+  app.get('/', (req, res) => {
+    res.json({ service: 'InternTrack API', status: 'ok' });
+  });
+
   // Health check
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
