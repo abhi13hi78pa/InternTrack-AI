@@ -5,7 +5,7 @@ import { BrainCircuit, Sparkles, Target, CalendarDays, Loader2, ArrowRight, X } 
 import PrepCompanyInsights from '../components/PrepCompanyInsights';
 import PrepRoadmapTimeline from '../components/PrepRoadmapTimeline';
 import PrepStudyMaterials from '../components/PrepStudyMaterials';
-import { parseApiResponse } from '../utils/api';
+import { apiFetch, parseApiResponse } from '../utils/api';
 
 function PrepHub() {
   const { token } = useAuth();
@@ -29,7 +29,7 @@ function PrepHub() {
 
   const fetchRoadmaps = async () => {
     try {
-      const res = await fetch('/api/ai/roadmaps', {
+      const res = await apiFetch('/api/ai/roadmaps', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await parseApiResponse(res, 'Failed to load prep roadmaps');
@@ -48,7 +48,7 @@ function PrepHub() {
     e.preventDefault();
     setGenerating(true);
     try {
-      const res = await fetch('/api/ai/generate', {
+      const res = await apiFetch('/api/ai/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function PrepHub() {
   const deleteRoadmap = async (id) => {
     if (!window.confirm('Are you sure you want to delete this roadmap?')) return;
     try {
-      const res = await fetch(`/api/ai/roadmaps/${id}`, {
+      const res = await apiFetch(`/api/ai/roadmaps/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -90,7 +90,7 @@ function PrepHub() {
 
   const updateTaskStatus = async (taskId, completed) => {
     try {
-      const res = await fetch(`/api/ai/roadmaps/${activeRoadmap._id}/tasks/${taskId}`, {
+      const res = await apiFetch(`/api/ai/roadmaps/${activeRoadmap._id}/tasks/${taskId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { parseApiResponse } from '../utils/api';
+import { apiFetch, parseApiResponse } from '../utils/api';
 
 const AuthContext = createContext();
 
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await apiFetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGoogle = async (credentialToken) => {
     try {
-      const res = await fetch('/api/auth/google', {
+      const res = await apiFetch('/api/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialToken }),
@@ -91,7 +91,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginWithGithub = async (code) => {
     try {
-      const res = await fetch('/api/auth/github', {
+      const res = await apiFetch('/api/auth/github', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),

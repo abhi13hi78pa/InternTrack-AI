@@ -1,3 +1,17 @@
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
+export function apiUrl(path) {
+  if (!path.startsWith('/')) {
+    return `${API_BASE_URL}/${path}`;
+  }
+
+  return `${API_BASE_URL}${path}`;
+}
+
+export function apiFetch(path, options) {
+  return fetch(apiUrl(path), options);
+}
+
 export async function parseApiResponse(response, fallbackMessage = 'Request failed') {
   const contentType = response.headers.get('content-type') || '';
   const body = await response.text();
@@ -18,4 +32,3 @@ export async function parseApiResponse(response, fallbackMessage = 'Request fail
 
   return data ?? body;
 }
-

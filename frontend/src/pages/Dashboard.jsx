@@ -14,7 +14,7 @@ import { useTheme } from '../contexts/ThemeContext'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { useAuth } from '../contexts/AuthContext'
-import { parseApiResponse } from '../utils/api'
+import { apiFetch, parseApiResponse } from '../utils/api'
 
 function Dashboard() {
   const { darkMode } = useTheme()
@@ -47,7 +47,7 @@ function Dashboard() {
     setSubmitting(true)
 
     try {
-      const response = await fetch('/api/applications', {
+      const response = await apiFetch('/api/applications', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('/api/applications', {
+        const response = await apiFetch('/api/applications', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
